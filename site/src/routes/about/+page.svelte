@@ -31,7 +31,7 @@
 	@media (max-width: 720px) {
 		.poster { grid-template-columns: 1fr; }
 		.band :global(.nd-hanzi) { writing-mode: horizontal-tb; }
-		.body { padding: var(--nd-space-16) var(--nd-space-5) var(--nd-space-8); }
-		.seal { right: var(--nd-space-4); top: var(--nd-space-4); }
+		.body { padding: var(--nd-space-5) var(--nd-space-5) var(--nd-space-8); }
+		.seal { position: static; display: flex; justify-content: flex-end; justify-self: stretch; margin-bottom: var(--nd-space-3); /* in flow on phones: never covers the text */ }
 	}
 </style>
