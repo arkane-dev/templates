@@ -1,0 +1,7 @@
+# Wails: build/ holds icons and platform manifests (commit those); build/bin holds binaries (don't).
+build/bin
+node_modules
+frontend/build
+frontend/.svelte-kit
+.venv
+frontend/package.json.md5

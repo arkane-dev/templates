@@ -1,0 +1,9 @@
+{
+	"extends": "$app/tsconfig",
+	"compilerOptions": {
+		"strict": true
+	},
+	"include": ["src", "vite.config.ts"],
+	// Wails-generated bindings: the .js files are untyped; imports resolve to the .d.ts beside them.
+	"exclude": ["src/lib/wailsjs/**/*.js"]
+}
