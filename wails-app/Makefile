@@ -3,7 +3,7 @@
 WAILS ?= $(shell command -v wails 2>/dev/null || echo $(HOME)/go/bin/wails)
 TAGS  := $(if $(filter Linux,$(shell uname -s)),-tags webkit2_41,)
 
-.PHONY: dev build test bindings frontend
+.PHONY: dev build test bindings frontend windows windows-installer
 
 dev:            ## live-reload desktop app (Go + Svelte)
 	$(WAILS) dev $(TAGS)
@@ -19,3 +19,14 @@ bindings: frontend  ## regenerate frontend/src/lib/wailsjs after changing Go met
 
 test: frontend  ## Go tests (need frontend/build to exist for go:embed)
 	go vet ./... && go test ./...
+
+# Cross-compiles from Linux: WebView2 is pure Go, no Windows toolchain needed.
+# Targets need Windows 10/11 (WebView2 runtime ships with them).
+windows:        ## build/bin/<app>.exe
+	$(WAILS) build -platform windows/amd64
+
+windows-installer:  ## NSIS installer in build/bin/ (needs makensis: sudo pacman -S nsis)
+	$(WAILS) build -platform windows/amd64 -nsis
+
+# macOS: Wails cannot cross-compile to Mac (needs Apple's SDK + toolchain). Build on a Mac or in CI.
+

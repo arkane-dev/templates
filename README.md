@@ -19,6 +19,8 @@ It refuses to overwrite an existing folder.
 
 ## Requirements
 - `uv`, Go ≥ 1.25, Wails CLI v2.14 (`go install github.com/wailsapp/wails/v2/cmd/wails@v2.14.0`).
+- Windows builds cross-compile from Linux: `make windows` (.exe) or `make windows-installer` (NSIS, needs `nsis`).
+- macOS builds cannot be made on Linux (Wails refuses; needs Apple SDK). Use a Mac or macOS CI.
 - Linux: GTK3 + WebKitGTK 4.1. Builds use `-tags webkit2_41` (the Makefile and script add it).
   Ignore `wails doctor` saying "libwebkit not found": it checks for 4.0.
 - NEONDECK built: `cd sharable_assets/neondeck && npm run build`.

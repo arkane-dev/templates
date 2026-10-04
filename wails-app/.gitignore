@@ -5,3 +5,4 @@ frontend/build
 frontend/.svelte-kit
 .venv
 frontend/package.json.md5
+build/windows/icon.ico
