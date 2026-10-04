@@ -69,7 +69,7 @@
 	.hero-visual { --nd-bracket-color: var(--nd-accent); position: relative; display: grid; place-items: center; margin: var(--nd-space-8); overflow: hidden; }
 	.scn { position: absolute; top: var(--nd-space-4); left: var(--nd-space-4); color: var(--nd-accent); }
 	.scn2 { position: absolute; bottom: var(--nd-space-4); right: var(--nd-space-4); }
-	.content { max-width: var(--nd-content-max); margin: 0 auto; padding: var(--nd-space-16) var(--nd-gutter); display: grid; gap: var(--nd-space-24); }
+	.content { max-width: var(--nd-content-max); margin: 0 auto; padding: var(--nd-space-16) var(--nd-gutter); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--nd-space-24); }
 	.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); border-block: 1px solid var(--nd-line); }
 	.ft { padding: var(--nd-space-6) var(--nd-space-5); border-right: 1px solid var(--nd-line); }
 	.ft:last-child { border-right: 0; }
