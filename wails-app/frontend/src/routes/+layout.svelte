@@ -49,7 +49,8 @@
 	:global(.nd-shell > .topbar) { --wails-draggable: drag; }
 	:global(.nd-shell > .topbar a, .nd-shell > .topbar button) { --wails-draggable: no-drag; }
 
-	.side { display: grid; gap: 2px; }
+	/* Sticky, so the nav stays in view on long pages. */
+	.side { position: sticky; top: var(--nd-topbar-h); display: grid; gap: 2px; }
 	.side a {
 		display: flex;
 		align-items: baseline;
