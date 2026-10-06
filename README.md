@@ -1,5 +1,7 @@
 # templates
 
+To use these, clone NEONDECK beside this repo: `git clone https://github.com/arkane-dev/neondeck sharable_assets`.
+
 Starting points for every cyberpunk_apps project. Each new project lives in `cyberpunk_apps/<name>/`
 as its own git repo, with the standard environment (uv venv + nodeenv) and NEONDECK.
 
