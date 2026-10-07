@@ -33,3 +33,7 @@ cd templates && source .venv/bin/activate
 cd site && npm run dev                          # or: cd wails-app && make dev
 ```
 After changing a template, test it end to end: `./new-project.sh zz-test site` (and `app`), then delete `../zz-test`.
+
+## License
+
+[MIT](LICENSE) © 2026 Andrew R. Kane
