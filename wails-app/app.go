@@ -7,7 +7,7 @@ import (
 	"runtime"
 )
 
-// Version is rewritten at release time (or by hand). Shown in the status bar.
+// Version is set by `make dist VERSION=x.y.z` (or by hand). Shown in the status bar.
 const Version = "0.1.0"
 
 // App holds backend state. Every exported method is callable from the frontend

@@ -1,0 +1,90 @@
+# Build the macOS app and attach it to a GitHub release.
+#
+# Wails can't cross-compile to macOS, so this runs on a Mac runner. Linux and Windows
+# builds are made locally (make dist VERSION=x.y.z) and uploaded with the release.
+#
+# The app is ad-hoc signed only, not signed with an Apple Developer ID or notarised.
+# Apple Silicon needs at least an ad-hoc signature to run. Gatekeeper still blocks
+# the first launch: users clear the quarantine flag (see the release notes).
+#
+# The frontend installs NEONDECK from ../sharable_assets, so the job checks out both
+# repos side by side, the same layout as on the dev machine.
+name: macOS build
+
+on:
+  release:
+    types: [published]
+  # Run by hand for an existing release, e.g. gh workflow run macos.yml -f tag=v0.1.1
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build and attach to (e.g. v0.1.1)
+        required: true
+      ref:
+        description: Commit or branch to build, if not the tag itself
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  macos:
+    # Intel runner: Apple Silicon runners often queue for capacity. It still builds the
+    # universal app, which runs on both Intel and Apple Silicon.
+    runs-on: macos-15-intel
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out the app at the release tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || env.TAG }}
+          path: wails-app
+
+      - name: Check out NEONDECK
+        uses: actions/checkout@v7
+        with:
+          repository: arkane-dev/neondeck
+          path: sharable_assets
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: wails-app/go.mod
+          cache-dependency-path: wails-app/go.sum
+
+      - name: Build NEONDECK
+        working-directory: sharable_assets/neondeck
+        run: npm ci --no-audit --no-fund && npm run build
+
+      - name: Install the Wails CLI (same version as go.mod)
+        working-directory: wails-app
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@$(go list -m -f '{{.Version}}' github.com/wailsapp/wails/v2)
+
+      - name: Build the universal app
+        working-directory: wails-app
+        run: |
+          (cd frontend && npm ci --no-audit --no-fund)
+          wails build -platform darwin/universal -clean
+
+      - name: Ad-hoc sign, zip and attach to the release
+        working-directory: wails-app/build/bin
+        run: |
+          VERSION="${TAG#v}"
+          APP="$(ls -d *.app | head -1)"
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --verbose "$APP"
+          ZIP="wails-app-${VERSION}-macos-universal.zip"
+          ditto -c -k --keepParent "$APP" "$ZIP"
+          gh release upload "$TAG" "$ZIP" --clobber -R "$GITHUB_REPOSITORY"
+          # Add the zip to SHA256SUMS, replacing any older line for it.
+          gh release download "$TAG" -p SHA256SUMS -R "$GITHUB_REPOSITORY" --clobber || touch SHA256SUMS
+          grep -v "  $ZIP\$" SHA256SUMS > SHA256SUMS.new || true
+          shasum -a 256 "$ZIP" >> SHA256SUMS.new
+          mv SHA256SUMS.new SHA256SUMS
+          cat SHA256SUMS
+          gh release upload "$TAG" SHA256SUMS --clobber -R "$GITHUB_REPOSITORY"

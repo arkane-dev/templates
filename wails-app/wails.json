@@ -10,5 +10,12 @@
   "author": {
     "name": "Andrew",
     "email": "dev@andrewrkane.com"
+  },
+  "info": {
+    "companyName": "Andrew R. Kane",
+    "productName": "Wails App",
+    "productVersion": "0.1.0",
+    "copyright": "Copyright © 2026 Andrew R. Kane. MIT license.",
+    "comments": ""
   }
 }

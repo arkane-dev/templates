@@ -61,6 +61,7 @@ else
 	# "wails-app" appears in go.mod, wails.json, main.go, config.ts, backend.ts, package files, README.
 	grep -rlI --exclude-dir=wailsjs "wails-app" . | xargs sed -i "s/wails-app/$name/g"
 	sed -i "s/WAILS_APP_/$brand/" frontend/src/lib/config.ts
+	sed -i "s/\"productName\": \"Wails App\"/\"productName\": \"$title\"/" wails.json
 	sed -i "s|file:../../../sharable_assets/neondeck|file:../../sharable_assets/neondeck|" frontend/package.json frontend/package-lock.json
 fi
 

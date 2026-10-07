@@ -3,7 +3,7 @@
 WAILS ?= $(shell command -v wails 2>/dev/null || echo $(HOME)/go/bin/wails)
 TAGS  := $(if $(filter Linux,$(shell uname -s)),-tags webkit2_41,)
 
-.PHONY: dev build test bindings frontend windows windows-installer
+.PHONY: dev build test bindings frontend windows windows-installer dist
 
 dev:            ## live-reload desktop app (Go + Svelte)
 	$(WAILS) dev $(TAGS)
@@ -28,5 +28,11 @@ windows:        ## build/bin/<app>.exe
 windows-installer:  ## NSIS installer in build/bin/ (needs makensis: sudo pacman -S nsis)
 	$(WAILS) build -platform windows/amd64 -nsis
 
-# macOS: Wails cannot cross-compile to Mac (needs Apple's SDK + toolchain). Build on a Mac or in CI.
+# Release archives (Linux + Windows) and SHA256SUMS in build/dist/. Sets the version first.
+dist:           ## make dist VERSION=x.y.z
+	@test -n "$(VERSION)" || { echo "usage: make dist VERSION=x.y.z"; exit 1; }
+	scripts/dist.sh $(VERSION)
+
+# macOS: Wails cannot cross-compile to Mac (needs Apple's SDK + toolchain).
+# .github/workflows/macos.yml builds it on a Mac runner when a release is published.
 

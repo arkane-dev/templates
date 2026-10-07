@@ -26,6 +26,10 @@ func main() {
 		Height:    820,
 		MinWidth:  960,
 		MinHeight: 640,
+		// Wails defaults the max size to the monitor the window opens on. With mixed
+		// portrait and landscape monitors, xfwm4 then refuses to maximise. A large cap avoids that.
+		MaxWidth:  16384,
+		MaxHeight: 16384,
 		// NEONDECK draws its own title bar (AppShell top bar = drag region + window controls).
 		Frameless: true,
 		AssetServer: &assetserver.Options{
