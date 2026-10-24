@@ -27,8 +27,12 @@ UI-only work without Go: `cd frontend && npm run dev`. Backend calls fall back t
 | `frontend/src/routes/` | pages; hash router (`#/settings`) |
 
 ## Release
+0. Once per machine: `go run ./scripts/release-sign -keygen`. It writes the update signing key to
+   `~/.config/cyberpunk-apps/release-signing.key` and prints the public key, which goes in
+   `updatePublicKey` in `updater.go`. All the apps share one key. **Back the private key up.** Without
+   it, installed apps can't verify new releases, and users have to download the next one by hand.
 1. `make dist VERSION=x.y.z` sets the version in `app.go` and `wails.json`, builds Linux and Windows,
-   and writes the archives and `SHA256SUMS` to `build/dist/`.
+   signs each archive (`*.sig`), and writes them and `SHA256SUMS` to `build/dist/`.
 2. Commit, tag `vx.y.z` and push. Then `gh release create vx.y.z -F notes.md build/dist/*`.
 3. Publishing the release starts `.github/workflows/macos.yml`. It builds a universal macOS app
    on a GitHub Mac runner and attaches the zip and its checksum to the release. To build for
@@ -37,6 +41,19 @@ UI-only work without Go: `cd frontend && npm run dev`. Backend calls fall back t
 The Mac app is ad-hoc signed only (no Apple Developer ID, not notarised). Tell users how to
 get past Gatekeeper: *System Settings → Privacy & Security → Open Anyway*, or
 `xattr -dr com.apple.quarantine /Applications/<app>.app`. Needs macOS 12 or later.
+
+## Auto-update
+`updater.go` checks the latest GitHub release of `updateRepo` (set in `main.go`).
+
+- **When:** once a day at startup, if Settings → Updates allows it, which is the default. "Check now" checks any time.
+- **What it does:** shows a banner with Update, What's new and Later. Update downloads this system's archive and its `.sig`,
+  checks the ed25519 signature against `updatePublicKey`, and swaps the new binary in. Restart runs it.
+  An archive whose signature fails is never installed.
+- **Linux and Windows** update in place. Windows renames the running `.exe` aside first, and the next start deletes it.
+- **macOS** gets the banner and a download link. Its build happens in CI, which doesn't hold the signing key.
+- **No write access** to the app's folder (say `/usr/bin` or Program Files): the banner offers the download instead.
+- **Testing:** `UPDATE_API_BASE=http://127.0.0.1:8799 make dev` points it at a local stand-in for the GitHub API.
+  Downloads from it still have to pass the signature check.
 
 ## Notes
 - `main.go` sets a large max window size. Without it, Wails caps the window at the size of the

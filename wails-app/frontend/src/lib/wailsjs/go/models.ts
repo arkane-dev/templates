@@ -28,6 +28,8 @@ export namespace main {
 	    accent: string;
 	    glowSize: number;
 	    scanlines: boolean;
+	    autoUpdate: boolean;
+	    lastUpdateCheck: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new Settings(source);
@@ -38,6 +40,32 @@ export namespace main {
 	        this.accent = source["accent"];
 	        this.glowSize = source["glowSize"];
 	        this.scanlines = source["scanlines"];
+	        this.autoUpdate = source["autoUpdate"];
+	        this.lastUpdateCheck = source["lastUpdateCheck"];
+	    }
+	}
+	export class UpdateInfo {
+	    current: string;
+	    latest: string;
+	    available: boolean;
+	    canInstall: boolean;
+	    why: string;
+	    notes: string;
+	    pageUrl: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UpdateInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.current = source["current"];
+	        this.latest = source["latest"];
+	        this.available = source["available"];
+	        this.canInstall = source["canInstall"];
+	        this.why = source["why"];
+	        this.notes = source["notes"];
+	        this.pageUrl = source["pageUrl"];
 	    }
 	}
 

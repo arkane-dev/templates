@@ -6,12 +6,28 @@ export function AppInfo() {
   return window['go']['main']['App']['AppInfo']();
 }
 
+export function CheckForUpdate() {
+  return window['go']['main']['App']['CheckForUpdate']();
+}
+
 export function GetSettings() {
   return window['go']['main']['App']['GetSettings']();
 }
 
+export function InstallUpdate() {
+  return window['go']['main']['App']['InstallUpdate']();
+}
+
+export function OpenURL(arg1) {
+  return window['go']['main']['App']['OpenURL'](arg1);
+}
+
 export function Ping(arg1) {
   return window['go']['main']['App']['Ping'](arg1);
+}
+
+export function RestartForUpdate() {
+  return window['go']['main']['App']['RestartForUpdate']();
 }
 
 export function SaveSettings(arg1) {

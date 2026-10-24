@@ -17,6 +17,9 @@ var assets embed.FS
 // appName is rewritten by new-project.sh. It names the window and the settings folder.
 const appName = "wails-app"
 
+// updateRepo is where releases are published. Auto-update checks its latest release.
+const updateRepo = "arkane-dev/wails-app"
+
 func main() {
 	app := NewApp()
 

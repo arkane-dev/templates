@@ -3,16 +3,19 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { AppShell, Tag } from '@cyberpunk-apps/neondeck';
-	import { app, backend, inWails, prefs, loadPrefs, type AppInfo } from '#lib';
+	import { app, backend, inWails, prefs, loadPrefs, listenForUpdates, type AppInfo } from '#lib';
 	import WindowControls from '#lib/WindowControls.svelte';
+	import UpdateBanner from '#lib/UpdateBanner.svelte';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
 	let info = $state<AppInfo | null>(null);
 
-	onMount(async () => {
-		info = await backend.appInfo();
-		await loadPrefs();
+	onMount(() => {
+		const stop = listenForUpdates();
+		backend.appInfo().then((i) => (info = i));
+		loadPrefs();
+		return stop;
 	});
 
 	// With the hash router, page.url.hash holds the route ("#/settings"); "" means home.
@@ -42,6 +45,7 @@
 	{/snippet}
 
 	{@render children()}
+	<UpdateBanner />
 </AppShell>
 
 <style>

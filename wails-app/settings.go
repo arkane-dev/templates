@@ -15,10 +15,13 @@ type Settings struct {
 	Accent    string  `json:"accent"`    // NEONDECK accent: magenta | cyan | yellow | red | violet | jade | gold
 	GlowSize  float64 `json:"glowSize"`  // multiplies --nd-glow-size; 0 = off
 	Scanlines bool    `json:"scanlines"` // CRT overlay on the whole window
+	// AutoUpdate checks GitHub for a new release once a day at startup. Updating is always the user's call.
+	AutoUpdate      bool   `json:"autoUpdate"`
+	LastUpdateCheck string `json:"lastUpdateCheck"` // RFC 3339, set by the app
 }
 
 func defaultSettings() Settings {
-	return Settings{Accent: "magenta", GlowSize: 1, Scanlines: false}
+	return Settings{Accent: "magenta", GlowSize: 1, Scanlines: false, AutoUpdate: true}
 }
 
 type SettingsStore struct {

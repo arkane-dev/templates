@@ -7,10 +7,12 @@ import type { main } from './wailsjs/go/models';
 
 export type AppInfo = main.AppInfo;
 export type Settings = main.Settings;
+export type UpdateInfo = main.UpdateInfo;
 
 export const inWails = typeof window !== 'undefined' && 'go' in window;
 
-const defaults: Settings = { accent: 'magenta', glowSize: 1, scanlines: false } as Settings;
+const defaults: Settings = { accent: 'magenta', glowSize: 1, scanlines: false, autoUpdate: true, lastUpdateCheck: '' } as Settings;
+const noUpdate = { current: 'dev', latest: 'dev', available: false, canInstall: false, why: '', notes: '', pageUrl: '' } as UpdateInfo;
 const browserInfo = {
 	name: 'wails-app', version: 'dev', goVersion: '—', os: 'browser', arch: '—', hostname: 'localhost', cpus: 0
 } as AppInfo;
@@ -21,7 +23,16 @@ export const backend = {
 		inWails ? Go.Ping(msg) : Promise.resolve(`> ACK "${msg}" (browser stub, no Go backend)`),
 	getSettings: (): Promise<Settings> => (inWails ? Go.GetSettings() : Promise.resolve({ ...defaults })),
 	saveSettings: (s: Settings): Promise<void> => (inWails ? Go.SaveSettings(s) : Promise.resolve()),
-	settingsPath: (): Promise<string> => (inWails ? Go.SettingsPath() : Promise.resolve('(browser: not saved)'))
+	settingsPath: (): Promise<string> => (inWails ? Go.SettingsPath() : Promise.resolve('(browser: not saved)')),
+	checkForUpdate: (): Promise<UpdateInfo> => (inWails ? Go.CheckForUpdate() : Promise.resolve({ ...noUpdate })),
+	installUpdate: (): Promise<void> => (inWails ? Go.InstallUpdate() : Promise.reject(new Error('Updates need the desktop app.'))),
+	restartForUpdate: (): Promise<void> => (inWails ? Go.RestartForUpdate() : Promise.resolve()),
+	openURL: (url: string): void => {
+		if (inWails) Go.OpenURL(url);
+		else window.open(url, '_blank', 'noopener');
+	},
+	/** Go raises "update:available" after its once-a-day startup check finds a release. */
+	onUpdateAvailable: (fn: (info: UpdateInfo) => void): (() => void) => (inWails ? Rt.EventsOn('update:available', fn) : () => {})
 };
 
 export const win = {

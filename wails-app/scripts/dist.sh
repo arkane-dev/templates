@@ -21,6 +21,9 @@ dist=build/dist
 rm -rf "$dist" && mkdir -p "$dist"
 tar czf "$dist/$name-$version-linux-amd64.tar.gz" -C build/bin "$name"
 (cd build/bin && zip -q "../dist/$name-$version-windows-amd64.zip" "$name.exe")
+# Sign each archive (FILE.sig). Installed apps refuse an update whose signature doesn't verify.
+# The key lives outside the repo: see scripts/release-sign.
+go run ./scripts/release-sign "$dist"/*.tar.gz "$dist"/*.zip
 (cd "$dist" && sha256sum -- * > SHA256SUMS)
 
 echo

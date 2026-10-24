@@ -4,9 +4,17 @@ import {main} from '../models';
 
 export function AppInfo():Promise<main.AppInfo>;
 
+export function CheckForUpdate():Promise<main.UpdateInfo>;
+
 export function GetSettings():Promise<main.Settings>;
 
+export function InstallUpdate():Promise<void>;
+
+export function OpenURL(arg1:string):Promise<void>;
+
 export function Ping(arg1:string):Promise<string>;
+
+export function RestartForUpdate():Promise<void>;
 
 export function SaveSettings(arg1:main.Settings):Promise<void>;
 

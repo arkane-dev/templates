@@ -1,7 +1,7 @@
 <!-- Settings: persisted by Go to the OS config dir. Accent, glow and scanlines apply live. -->
 <script lang="ts">
 	import { SectionHeader, Panel, Button, Tag } from '@cyberpunk-apps/neondeck';
-	import { prefs, savePrefs } from '#lib';
+	import { backend, prefs, savePrefs, update, checkForUpdate, installUpdate } from '#lib';
 
 	const accents = ['magenta', 'cyan', 'yellow', 'red', 'violet', 'jade', 'gold'];
 	let saved = $state(false);
@@ -44,6 +44,33 @@
 				{#if saved}<Tag tone="success" dot>saved</Tag>{/if}
 			</div>
 		</Panel>
+		<Panel title="Updates" index="03">
+			<label class="check">
+				<input type="checkbox" bind:checked={prefs.value.autoUpdate} onchange={save} />
+				<span class="nd-label">Check for updates once a day</span>
+			</label>
+			<p class="nd-meta hint">Asks GitHub for the latest release. Nothing installs until you choose to. Every update is signature-checked first.</p>
+			<div class="row">
+				<Button variant="outline" onclick={checkForUpdate} disabled={update.phase === 'checking' || update.phase === 'installing'}>Check now</Button>
+				<span class="nd-meta" role="status" aria-live="polite">
+					{#if update.phase === 'checking'}&gt; checking…
+					{:else if update.phase === 'current'}You have the latest version, {update.info?.current}.
+					{:else if update.phase === 'available' && update.info}Version {update.info.latest} is out. {update.info.canInstall ? '' : update.info.why}
+					{:else if update.phase === 'installing'}&gt; downloading and checking the signature…
+					{:else if update.phase === 'ready'}Installed. Restart to use it.
+					{:else if update.phase === 'error'}<span class="err">{update.error}</span>
+					{/if}
+				</span>
+			</div>
+			{#if update.phase === 'available' && update.info}
+				<div class="row">
+					{#if update.info.canInstall}<Button onclick={installUpdate}>Update to {update.info.latest}</Button>
+					{:else}<Button arrow onclick={() => backend.openURL(update.info!.pageUrl)}>Download {update.info.latest}</Button>{/if}
+				</div>
+			{:else if update.phase === 'ready'}
+				<div class="row"><Button onclick={() => backend.restartForUpdate()}>Restart now</Button></div>
+			{/if}
+		</Panel>
 	{:else}
 		<p class="nd-meta">&gt; loading settings<span class="nd-cursor"></span></p>
 	{/if}
@@ -62,5 +89,8 @@
 	input[type='range'] { accent-color: var(--nd-accent); }
 	.check { display: flex; align-items: center; gap: var(--nd-space-3); margin-bottom: var(--nd-space-6); }
 	.check input { accent-color: var(--nd-accent); width: 1rem; height: 1rem; }
-	.row { display: flex; align-items: center; gap: var(--nd-space-3); }
+	.row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--nd-space-3); margin-top: var(--nd-space-3); }
+	.hint { margin: 0 0 var(--nd-space-2); }
+	.err { color: var(--nd-danger); }
+	.content :global(.nd-panel + .nd-panel) { margin-top: var(--nd-space-6); }
 </style>
